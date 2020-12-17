@@ -1,4 +1,6 @@
 this otherwise breaks jackd by setting a strange size fixed buffer size
+jackd (and other audio apps) would then only work if the audio buffer
+size is a multiple of 48 which give very unusual strange numbers
 
 diff --git a/sound/soc/intel/atom/sst-mfld-platform-pcm.c b/sound/soc/intel/atom/sst-mfld-platform-pcm.c
 index 9e9b05883557..aeaef883807d 100644

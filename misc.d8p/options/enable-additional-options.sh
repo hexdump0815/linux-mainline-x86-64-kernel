@@ -16,17 +16,17 @@ cd /compile/source/linux-stable
 ./scripts/config -d CONFIG_DRM_RADEON
 ./scripts/config -d CONFIG_DRM_AMDGPU
 ./scripts/config -d CONFIG_DRM_ETNAVIV
-./scripts/config -d CONFIG_KERNEL_LZ4
 ./scripts/config -d CONFIG_XFS_FS
 ./scripts/config -d CONFIG_REISERFS_FS
 ./scripts/config -d CONFIG_OCFS2_FS
+./scripts/config -d CONFIG_KERNEL_LZ4
 
-for i in `cat /compile/doc/stable/misc.cbg/options/additional-options-*-yes.txt`; do
+for i in `cat /compile/doc/stable/misc.d8p/options/additional-options-*-yes.txt`; do
   echo $i
   ./scripts/config -e $i
 done
 
-for i in `cat /compile/doc/stable/misc.cbg/options/additional-options-*-mod.txt`; do
+for i in `cat /compile/doc/stable/misc.d8p/options/additional-options-*-mod.txt`; do
   echo $i
   ./scripts/config -m $i
 done
