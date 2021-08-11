@@ -1,19 +1,18 @@
 # directories:
-# - /compile/doc/stable - the files in this dir
-# - /compile/source/linux-stable - the kernel sources checked out from gitrepo
-# - /compile/result/stable - the resulting kernel, modules etc. tar.gz files
+# - /compile/doc/stable-86 - the files in this dir
+# - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
+# - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
 
 # patches:
 # fix jack audio - adjust audio buffer size limits so that jackd will work
-patch -p1 < /compile/doc/stable/misc/patches/fix-jack-audio.patch
+patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
 
-cp /compile/doc/stable/config.d8p /compile/source/linux-stable/.config
-cd /compile/source/linux-stable
+cp /compile/doc/stable-86/config.d8p /compile/source/linux-stable-86/.config
+cd /compile/source/linux-stable-86
 
-# git pull
-export ARCH=x86
+#export ARCH=x86
 # config self made and based on https://www.studioteabag.com/science/dell-venue-pro-linux/
-make oldconfig
+make olddefconfig
 make -j 4 bzImage modules
 cd tools/perf
 make
@@ -35,11 +34,11 @@ cp -v arch/x86/boot/bzImage /boot/vmlinuz-${kver}
 cp -v System.map /boot/System.map-${kver}
 cd /boot
 update-initramfs -c -k ${kver}
-tar cvzf /compile/source/linux-stable/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
-cp -v /compile/doc/stable/config.d8p /compile/doc/stable/config.d8p.old
-cp -v /compile/source/linux-stable/.config /compile/doc/stable/config.d8p
-cp -v /compile/source/linux-stable/.config /compile/doc/stable/config.d8p-${kver}
-cp -v /compile/source/linux-stable/*.tar.gz /compile/result/stable
+tar cvzf /compile/source/linux-stable-86/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
+cp -v /compile/doc/stable-86/config.d8p /compile/doc/stable-86/config.d8p.old
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.d8p
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.d8p-${kver}
+cp -v /compile/source/linux-stable-86/*.tar.gz /compile/result/stable-86
 
 # alternative: make -j 2 deb-pkg - results in /usr/src
 #
