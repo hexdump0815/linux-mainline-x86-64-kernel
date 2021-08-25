@@ -1,0 +1,61 @@
+# directories:
+# - /compile/doc/stable-86 - the files in this dir
+# - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
+# - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
+
+# patches:
+# fix jack audio - adjust audio buffer size limits so that jackd will work
+patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+
+cp /compile/doc/stable-86/config.glk /compile/source/linux-stable-86/.config
+cd /compile/source/linux-stable-86
+
+# get and build the efi bootstub - required: apt-get install gnu-efi
+git clone --depth 1 -b release-R91-13904.B https://chromium.googlesource.com/chromiumos/third_party/bootstub
+cd bootstub
+make PREFIX=""
+cd ..
+
+#export ARCH=x86
+# config self made and based on https://www.studioteabag.com/science/dell-venue-pro-linux/
+make olddefconfig
+make -j 4 bzImage modules
+cd tools/perf
+make
+cd ../power/cpupower
+make
+cd ../../..
+export kver=`make kernelrelease`
+echo ${kver}
+# remove debug info if there and wanted
+# find . -type f -name '*.ko' | sudo xargs -n 1 objcopy --strip-unneeded
+make modules_install
+mkdir -p /lib/modules/${kver}/tools
+cp -v tools/perf/perf /lib/modules/${kver}/tools
+cp -v tools/power/cpupower/cpupower /lib/modules/${kver}/tools
+cp -v tools/power/cpupower/libcpupower.so.0.0.1 /lib/modules/${kver}/tools/libcpupower.so.0
+# make headers_install INSTALL_HDR_PATH=/usr
+cp -v .config /boot/config-${kver}
+cp -v arch/x86/boot/bzImage /boot/vmlinuz-${kver}
+cp -v System.map /boot/System.map-${kver}
+# start chromebook special - required: apt-get install liblz4-tool vboot-kernel-utils
+cp arch/x86_64/boot/bzImage bzImage
+cp /compile/doc/stable-86/misc.glk/misc/cmdline cmdline
+# for console via usb srial adapter - see: https://github.com/Sonicadvance1/linux/issues/27#issuecomment-823668871
+# cp /compile/doc/stable-86/misc.glk/misc/cmdline.usb cmdline
+cp bootstub/bootstub.efi bootstub.efi
+vbutil_kernel --pack vmlinux.kpart --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --version 1 --config cmdline --bootloader bootstub.efi --vmlinuz bzImage --arch x86_64
+cp -v vmlinux.kpart /boot/vmlinux.kpart-${kver}
+rm -f bzImage cmdline bootstub.efi kernel.itb vmlinux.kpart
+# end chromebook special
+cd /boot
+update-initramfs -c -k ${kver}
+tar cvzf /compile/source/linux-stable-86/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
+cp -v /compile/doc/stable-86/config.glk /compile/doc/stable-86/config.glk.old
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.glk
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.glk-${kver}
+cp -v /compile/source/linux-stable-86/*.tar.gz /compile/result/stable-86
+
+# alternative: make -j 2 deb-pkg - results in /usr/src
+#
+# IMPORTANT: after unpacking the result file on the target machine, do a "cd /boot ; update-initramfs -c -k ${kver}" there
