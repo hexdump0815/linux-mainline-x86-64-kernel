@@ -1,0 +1,49 @@
+# directories:
+# - /compile/doc/stable-86 - the files in this dir
+# - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
+# - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
+
+# patches:
+# fix jack audio - adjust audio buffer size limits so that jackd will work
+patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+
+# /boot/config-5.10.0-8-amd64 of debian bullseye was used as initial starting point
+cp /compile/doc/stable-86/config.odk /compile/source/linux-stable-86/.config
+cd /compile/source/linux-stable-86
+
+# remove the debian uefi certs if they are still in the config
+sed -i 's,debian/certs/debian-uefi-certs.pem,,g' .config
+# do not compile with debug info as it takes up too much space
+sed -i 's,CONFIG_DEBUG_INFO=y,# CONFIG_DEBUG_INFO is not set,g' .config
+
+#export ARCH=x86
+# config self made and based on https://www.studioteabag.com/science/dell-venue-pro-linux/
+make olddefconfig
+make -j 4 bzImage modules
+cd tools/perf
+make
+cd ../power/cpupower
+make
+cd ../../..
+export kver=`make kernelrelease`
+echo ${kver}
+# remove debug info if there and wanted
+# find . -type f -name '*.ko' | sudo xargs -n 1 objcopy --strip-unneeded
+make modules_install
+mkdir -p /lib/modules/${kver}/tools
+cp -v tools/perf/perf /lib/modules/${kver}/tools
+cp -v tools/power/cpupower/cpupower /lib/modules/${kver}/tools
+cp -v tools/power/cpupower/libcpupower.so.0.0.1 /lib/modules/${kver}/tools/libcpupower.so.0
+# make headers_install INSTALL_HDR_PATH=/usr
+cp -v .config /boot/config-${kver}
+cp -v arch/x86/boot/bzImage /boot/vmlinuz-${kver}
+cp -v System.map /boot/System.map-${kver}
+cd /boot
+update-initramfs -c -k ${kver}
+tar cvzf /compile/source/linux-stable-86/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
+cp -v /compile/doc/stable-86/config.odk /compile/doc/stable-86/config.odk.old
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.odk
+cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.odk-${kver}
+cp -v /compile/source/linux-stable-86/*.tar.gz /compile/result/stable-86
+
+# IMPORTANT: after unpacking the result file on the target machine, do a "cd /boot ; update-initramfs -c -k ${kver}" there
