@@ -1,2 +1,0 @@
-config.debian - original debian bullseye amd64 kernel config
-config.debian.adjusted - adjusted config from above trying to get it to boot via depthcharge
