@@ -1,6 +1,6 @@
 # directories:
 # - /compile/doc/stable-86 - the files in this dir
-# - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
+# - /compile/source/linux-stable-cbo - the kernel sources checked out from gitrepo
 # - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
 # - /compile/doc/kernel-config-options - https://github.com/hexdump0815/kernel-config-options
 # name: stb-cbo
@@ -8,6 +8,9 @@
 # patches:
 # fix jack audio - adjust audio buffer size limits so that jackd will work - not sure yet if this is really needed here
 #patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+
+# required
+apt-get -y install libelf-dev vboot-kernel-utils
 
 # get and build the efi bootstub - required: apt-get install gnu-efi - replaced by alternative approach below
 #git clone --depth 1 -b release-R91-13904.B https://chromium.googlesource.com/chromiumos/third_party/bootstub
@@ -18,7 +21,7 @@
 cd /compile/source
 git clone https://gitlab.freedesktop.org/jbarnes/cros-util.git
 
-cd /compile/source/linux-stable-86
+cd /compile/source/linux-stable-cbo
 
 #export ARCH=x86
 # defconfig + kernel-config-options based config will follow later
@@ -51,18 +54,20 @@ cp arch/x86_64/boot/bzImage bzImage
 cp /compile/doc/stable-86/misc.cbo/misc/cmdline cmdline
 # for console via usb srial adapter - see: https://github.com/Sonicadvance1/linux/issues/27#issuecomment-823668871
 # cp /compile/doc/stable-86/misc.cbo/misc/cmdline.usb cmdline
-cp bootstub/bootstub.efi bootstub.efi
+# old approach
+# cp -v bootstub/bootstub.efi bootstub.efi
+cp -v ../cros-util/bootstub.efi bootstub.efi
 vbutil_kernel --pack vmlinux.kpart --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --version 1 --config cmdline --bootloader /compile/source/cros-util/bootstub.efi --vmlinuz bzImage --arch x86_64
 cp -v vmlinux.kpart /boot/vmlinux.kpart-${kver}
 rm -f bzImage cmdline kernel.itb vmlinux.kpart
 # end chromebook special
 cd /boot
 update-initramfs -c -k ${kver}
-tar cvzf /compile/source/linux-stable-86/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
+tar cvzf /compile/source/linux-stable-cbo/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
 cp -v /compile/doc/stable-86/config.cbo /compile/doc/stable-86/config.cbo.old
-cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.cbo
-cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.cbo-${kver}
-cp -v /compile/source/linux-stable-86/*.tar.gz /compile/result/stable-86
+cp -v /compile/source/linux-stable-cbo/.config /compile/doc/stable-86/config.cbo
+cp -v /compile/source/linux-stable-cbo/.config /compile/doc/stable-86/config.cbo-${kver}
+cp -v /compile/source/linux-stable-cbo/*.tar.gz /compile/result/stable-86
 
 # alternative: make -j 2 deb-pkg - results in /usr/src
 #
