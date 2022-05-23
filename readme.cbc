@@ -31,7 +31,7 @@ done
 #export ARCH=x86
 # the kernel config is not yet arch/x86/configs/x86_64_defconfig based - instead an
 # adjusted version of the chromeos kernel config is used as starting point for now
-scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.cbc/misc/config-droid-cros-olddefconfig-adjusted /compile/doc/kernel-config-options/chromebooks-x86_64.cfg /compile/doc/kernel-config-options/docker-options.cfg /compile/doc/kernel-config-options/options-to-remove-generic.cfg /compile/doc/stable-86/misc.cbc/options/options-to-remove-special.cfg /compile/doc/kernel-config-options/additional-options-generic.cfg /compile/doc/stable-86/misc.cbc/options/additional-options-special.cfg
+scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.cbc/misc/config-rabbid-cros-olddefconfig-adjusted /compile/doc/kernel-config-options/chromebooks-x86_64.cfg /compile/doc/kernel-config-options/docker-options.cfg /compile/doc/kernel-config-options/options-to-remove-generic.cfg /compile/doc/stable-86/misc.cbc/options/options-to-remove-special.cfg /compile/doc/kernel-config-options/additional-options-generic.cfg /compile/doc/stable-86/misc.cbc/options/additional-options-special.cfg
 ( cd /compile/doc/kernel-config-options ; git rev-parse --verify HEAD ) > /compile/doc/stable-86/misc.cbc/options/kernel-config-options.version
 # old approach: using a cros config based with some required adjustments as a starting point
 #cp /compile/doc/stable-86/misc.cbc/misc/config-droid-cros-olddefconfig-adjusted .config
