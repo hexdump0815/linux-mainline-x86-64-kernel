@@ -1,23 +1,32 @@
 # directories:
 # - /compile/doc/stable-86 - the files in this dir
-# - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
+# - /compile/source/linux-stable-odk - the kernel sources checked out from gitrepo
 # - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
+# - /compile/doc/kernel-config-options - https://github.com/hexdump0815/kernel-config-options
+# - /compile/doc/kernel-extra-patches - https://github.com/hexdump0815/kernel-extra-patches
+# name: stb-odk
+
+cd /compile/source/linux-stable-odk
 
 # patches:
 # fix jack audio - adjust audio buffer size limits so that jackd will work
 patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
 
-# /boot/config-5.10.0-8-amd64 of debian bullseye was used as initial starting point
-cp /compile/doc/stable-86/config.odk /compile/source/linux-stable-86/.config
-cd /compile/source/linux-stable-86
-
-# remove the debian uefi certs if they are still in the config
-sed -i 's,debian/certs/debian-uefi-certs.pem,,g' .config
-# do not compile with debug info as it takes up too much space
-sed -i 's,CONFIG_DEBUG_INFO=y,# CONFIG_DEBUG_INFO is not set,g' .config
+# apply the multi gen lru kernel extra patches
+for i in /compile/doc/kernel-extra-patches/multi-gen-lru/v11/*.diff; do
+  echo === $i
+  patch -p1 < $i
+done
 
 #export ARCH=x86
-# config self made and based on https://www.studioteabag.com/science/dell-venue-pro-linux/
+# the kernel config is not yet arch/x86/configs/x86_64_defconfig based - instead an
+# adjusted version of the chromeos kernel config is used as starting point for now
+scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.odk/misc/config-5.10.0-12-amd64 /compile/doc/kernel-config-options/chromebooks-x86_64.cfg /compile/doc/kernel-config-options/docker-options.cfg /compile/doc/kernel-config-options/options-to-remove-generic.cfg /compile/doc/stable-86/misc.odk/options/options-to-remove-special.cfg /compile/doc/kernel-config-options/additional-options-generic.cfg /compile/doc/stable-86/misc.odk/options/additional-options-special.cfg
+( cd /compile/doc/kernel-config-options ; git rev-parse --verify HEAD ) > /compile/doc/stable-86/misc.odk/options/kernel-config-options.version
+# old approach: using a debian bullseye amd64 config as a starting point
+#cp /compile/doc/stable-86/misc.odk/misc/config-5.10.0-12-amd64 .config
+# remove the debian uefi certs if they are still in the config
+sed -i 's,debian/certs/debian-uefi-certs.pem,,g' .config
 make olddefconfig
 make -j 4 bzImage modules
 cd tools/perf
@@ -40,10 +49,10 @@ cp -v arch/x86/boot/bzImage /boot/vmlinuz-${kver}
 cp -v System.map /boot/System.map-${kver}
 cd /boot
 update-initramfs -c -k ${kver}
-tar cvzf /compile/source/linux-stable-86/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
+tar cvzf /compile/source/linux-stable-odk/${kver}.tar.gz /boot/*-${kver} /lib/modules/${kver}
 cp -v /compile/doc/stable-86/config.odk /compile/doc/stable-86/config.odk.old
-cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.odk
-cp -v /compile/source/linux-stable-86/.config /compile/doc/stable-86/config.odk-${kver}
-cp -v /compile/source/linux-stable-86/*.tar.gz /compile/result/stable-86
+cp -v /compile/source/linux-stable-odk/.config /compile/doc/stable-86/config.odk
+cp -v /compile/source/linux-stable-odk/.config /compile/doc/stable-86/config.odk-${kver}
+cp -v /compile/source/linux-stable-odk/*.tar.gz /compile/result/stable-86
 
 # IMPORTANT: after unpacking the result file on the target machine, do a "cd /boot ; update-initramfs -c -k ${kver}" there
