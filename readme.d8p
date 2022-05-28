@@ -2,6 +2,7 @@
 # - /compile/doc/stable-86 - the files in this dir
 # - /compile/source/linux-stable-86 - the kernel sources checked out from gitrepo
 # - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
+# name: stb-d8p - dell venue 8 pro
 
 # patches:
 # fix jack audio - adjust audio buffer size limits so that jackd will work

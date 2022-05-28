@@ -4,7 +4,7 @@
 # - /compile/result/stable-86 - the resulting kernel, modules etc. tar.gz files
 # - /compile/doc/kernel-config-options - https://github.com/hexdump0815/kernel-config-options
 # - /compile/doc/kernel-extra-patches - https://github.com/hexdump0815/kernel-extra-patches
-# name: stb-cbo
+# name: stb-cbo - chromebook octopus
 
 # required
 apt-get -y install libelf-dev vboot-kernel-utils
