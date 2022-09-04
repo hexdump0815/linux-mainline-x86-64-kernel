@@ -9,11 +9,15 @@
 cd /compile/source/linux-stable-odk
 
 # patches:
-# fix jack audio - adjust audio buffer size limits so that jackd will work
-patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+# fix jack audio - adjust audio buffer size limits so that jackd will work - not used for now
+#patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+# fix bloog bios vendor string for coreboot
+patch -p1 < /compile/doc/stable-86/misc/patches/bloog-audio-fix-v5.19.patch
+# fix audio jack pins for glk
+patch -p1 < /compile/doc/stable-86/misc/patches/glk-audio-jack-fix.patch
 
 # apply the multi gen lru kernel extra patches
-for i in /compile/doc/kernel-extra-patches/multi-gen-lru/v11/*.diff; do
+for i in /compile/doc/kernel-extra-patches/multi-gen-lru/v13/*.diff; do
   echo === $i
   patch -p1 < $i
 done
@@ -21,7 +25,7 @@ done
 #export ARCH=x86
 # the kernel config is not yet arch/x86/configs/x86_64_defconfig based - instead an
 # adjusted version of the chromeos kernel config is used as starting point for now
-scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.odk/misc/config-5.10.0-12-amd64 /compile/doc/kernel-config-options/chromebooks-x86_64.cfg /compile/doc/kernel-config-options/docker-options.cfg /compile/doc/kernel-config-options/options-to-remove-generic.cfg /compile/doc/stable-86/misc.odk/options/options-to-remove-special.cfg /compile/doc/kernel-config-options/additional-options-generic.cfg /compile/doc/stable-86/misc.odk/options/additional-options-special.cfg
+scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.odk/misc/config-5.10.0-17-amd64 /compile/doc/kernel-config-options/chromebooks-x86_64.cfg /compile/doc/kernel-config-options/docker-options.cfg /compile/doc/kernel-config-options/options-to-remove-generic.cfg /compile/doc/stable-86/misc.odk/options/options-to-remove-special.cfg /compile/doc/kernel-config-options/additional-options-generic.cfg /compile/doc/stable-86/misc.odk/options/additional-options-special.cfg
 ( cd /compile/doc/kernel-config-options ; git rev-parse --verify HEAD ) > /compile/doc/stable-86/misc.odk/options/kernel-config-options.version
 # old approach: using a debian bullseye amd64 config as a starting point
 #cp /compile/doc/stable-86/misc.odk/misc/config-5.10.0-12-amd64 .config
