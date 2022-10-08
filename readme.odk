@@ -17,7 +17,7 @@ patch -p1 < /compile/doc/stable-86/misc/patches/bloog-audio-fix-v5.19.patch
 patch -p1 < /compile/doc/stable-86/misc/patches/glk-audio-jack-fix.patch
 
 # apply the multi gen lru kernel extra patches
-for i in /compile/doc/kernel-extra-patches/multi-gen-lru/v13/*.diff; do
+for i in /compile/doc/kernel-extra-patches/multi-gen-lru/v15/*.diff; do
   echo === $i
   patch -p1 < $i
 done
