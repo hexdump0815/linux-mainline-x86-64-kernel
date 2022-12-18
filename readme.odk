@@ -24,8 +24,8 @@ scripts/kconfig/merge_config.sh -m /compile/doc/stable-86/misc.odk/misc/config-6
 #cp /compile/doc/stable-86/misc.odk/misc/config-5.10.0-12-amd64 .config
 # remove the debian uefi certs if they are still in the config
 #sed -i 's,debian/certs/debian-uefi-certs.pem,,g' .config
-sed -i 's,certs/signing_key.pem,,g' .config
 make olddefconfig
+sed -i 's,certs/signing_key.pem,,g' .config
 make -j 4 bzImage modules
 cd tools/perf
 make
