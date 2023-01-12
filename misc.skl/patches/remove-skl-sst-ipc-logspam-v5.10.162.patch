@@ -1,0 +1,15 @@
+diff --git a/sound/soc/intel/skylake/skl-sst-ipc.c b/sound/soc/intel/skylake/skl-sst-ipc.c
+index 7a425271b08b..f92108504fe9 100644
+--- a/sound/soc/intel/skylake/skl-sst-ipc.c
++++ b/sound/soc/intel/skylake/skl-sst-ipc.c
+@@ -355,8 +355,8 @@ int skl_ipc_process_notification(struct sst_generic_ipc *ipc,
+ 			break;
+ 
+ 		case IPC_GLB_NOTIFY_RESOURCE_EVENT:
+-			dev_err(ipc->dev, "MCPS Budget Violation: %x\n",
+-						header.primary);
++//			dev_err(ipc->dev, "MCPS Budget Violation: %x\n",
++//						header.primary);
+ 			break;
+ 
+ 		case IPC_GLB_NOTIFY_FW_READY:
