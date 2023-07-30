@@ -14,6 +14,8 @@ cd /compile/source/linux-stable-odk
 patch -p1 < /compile/doc/stable-86/misc.odk/patches/bloog-audio-fix-v6.1.patch
 # fix audio jack pins for glk - no longer required for v6.1 as it is included already
 #patch -p1 < /compile/doc/stable-86/misc.odk/patches/glk-audio-jack-fix.patch
+# fix kernel version number: + instead of -dirty at the end
+patch -p1 < /compile/doc/stable-86/misc.odk/patches/fix-kernel-version-number.patch
 
 #export ARCH=x86
 # the kernel config is not yet arch/x86/configs/x86_64_defconfig based - instead an
