@@ -5,6 +5,9 @@
 # - /compile/doc/kernel-config-options - https://github.com/hexdump0815/kernel-config-options
 # name: stb-odk - own debian kernel config based kernel
 
+# it looks like for newer kernel versions like v6.5 the following packages have to be
+# installed in order to get the tool compiled well: libelf-dev python3-dev libtraceevent-dev
+
 cd /compile/source/linux-stable-odk
 
 # patches:
@@ -15,7 +18,7 @@ patch -p1 < /compile/doc/stable-86/misc.odk/patches/bloog-audio-fix-v6.1.patch
 # fix audio jack pins for glk - no longer required for v6.1 as it is included already
 #patch -p1 < /compile/doc/stable-86/misc.odk/patches/glk-audio-jack-fix.patch
 # fix kernel version number: + instead of -dirty at the end
-patch -p1 < /compile/doc/stable-86/misc.odk/patches/fix-kernel-version-number.patch
+patch -p1 < /compile/doc/stable-86/misc.odk/patches/fix-kernel-version-number-v6.6.patch
 
 #export ARCH=x86
 # the kernel config is not yet arch/x86/configs/x86_64_defconfig based - instead an
@@ -30,6 +33,8 @@ make olddefconfig
 sed -i 's,certs/signing_key.pem,,g' .config
 make -j 4 bzImage modules
 cd tools/perf
+# this is to avoid compile errors
+export NO_JEVENTS=1
 make
 cd ../power/cpupower
 make
