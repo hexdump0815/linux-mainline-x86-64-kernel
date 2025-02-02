@@ -14,7 +14,7 @@ cd /compile/source/linux-stable-odk
 # fix bloog bios vendor string for coreboot
 patch -p1 < /compile/doc/stable-86/misc.odk/patches/bloog-audio-fix-v6.12.patch
 # fix jack audio - adjust audio buffer size limits so that jackd will work - not used for now
-#patch -p1 < /compile/doc/stable-86/misc/patches/fix-jack-audio.patch
+#patch -p1 < /compile/doc/stable-86/misc.odk/patches/fix-jack-audio.patch
 # fix audio jack pins for glk - no longer required for v6.1 as it is included already
 #patch -p1 < /compile/doc/stable-86/misc.odk/patches/glk-audio-jack-fix.patch
 # fix kernel version number: + instead of -dirty at the end

@@ -1,1 +1,0 @@
-console=tty1 loglevel=8 init=/sbin/init root=PARTUUID=%U/PARTNROFF=3 rootwait ro fsck.fix=yes fsck.repair=yes net.ifnames=0 ipv6.disable=1 noresume i915.modeset=1 apparmor=0
